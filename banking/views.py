@@ -314,4 +314,4 @@ def create_superuser_view(request):
     if not User.objects.filter(username="admin").exists():
         User.objects.create_superuser("admin", "admin@example.com", "Admin123!")
         return "✅ Admin created! Go to /admin/ — Username: admin | Password: Admin123!"
-    return "User already exists — just go to /admin/ and log in!"
+    return "User already exists — go to /admin/ and log in!"
