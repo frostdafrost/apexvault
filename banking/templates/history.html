@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .history-container {
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 35px;
+        background: linear-gradient(160deg, #16130d, #100d09);
+        border-radius: 24px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05);
+        position: relative;
+    }
+
+    .history-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .history-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--gold-light);
+        margin-bottom: 25px;
+        letter-spacing: 0.5px;
+    }
+
+    .tx-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .tx-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .tx-table th {
+        padding: 15px 12px;
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+    }
+
+    .tx-table td {
+        padding: 18px 12px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        color: var(--text-dark);
+        transition: background 0.3s ease;
+    }
+
+    .tx-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .tx-table tbody tr:hover {
+        background: rgba(212, 175, 55, 0.05);
+    }
+
+    .tx-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Typography for specific columns */
+    .tx-type {
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .tx-date {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 500;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tx-amount {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 15px;
+        text-align: right;
+    }
+
+    /* Premium Status Pills */
+    .status-pill {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border: 1px solid;
+    }
+
+    .status-completed {
+        background: rgba(74, 222, 128, 0.1);
+        color: var(--success);
+        border-color: rgba(74, 222, 128, 0.3);
+        box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
+    }
+
+    .status-pending {
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold-light);
+        border-color: var(--border-strong);
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+        animation: pulseGold 2s infinite alternate;
+    }
+
+    @keyframes pulseGold {
+        0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.1); }
+        100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
+    }
+
+    .status-rejected {
+        background: rgba(248, 113, 113, 0.1);
+        color: var(--danger);
+        border-color: rgba(248, 113, 113, 0.3);
+        box-shadow: 0 0 10px rgba(248, 113, 113, 0.1);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--text-muted);
+        font-size: 15px;
+        font-style: italic;
+    }
+
+    /* --- MOBILE RESPONSIVE CARD LAYOUT --- */
+    @media (max-width: 768px) {
+        .history-container { padding: 25px 20px; margin: 10px; }
+        
+        /* Hide table headers on mobile */
+        .tx-table thead {
+            display: none;
+        }
+
+        /* Make rows look like cards */
+        .tx-table, .tx-table tbody, .tx-table tr, .tx-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .tx-table tr {
+            background: rgba(10, 9, 8, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        .tx-table td {
+            border-bottom: none;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+        }
+
+        /* Add labels before each cell for mobile */
+        .tx-table td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            font-size: 11px;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: left;
+            margin-right: 15px;
+        }
+
+        .tx-table td.tx-amount {
+            font-size: 18px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+        
+        .tx-table td.tx-amount::before {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<div class="history-container">
+    <h2 class="history-title">Transaction History</h2>
+    
+    <div class="tx-table-wrapper">
+        <table class="tx-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Recipient / Source</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td data-label="Type" class="tx-type">{{ tx.transaction_type }}</td>
+                    <td data-label="Recipient" style="font-size: 14px; font-weight: 500;">{{ tx.beneficiary_name|default:"ApexVault" }}</td>
+                    <td data-label="Date" class="tx-date">{{ tx.timestamp|date:"M d, Y - H:i" }}</td>
+                    <td data-label="Status">
+                        <span class="status-pill 
+                            {% if tx.status == 'Completed' %}status-completed
+                            {% elif tx.status == 'Pending' %}status-pending
+                            {% else %}status-rejected{% endif %}">
+                            {{ tx.status }}
+                        </span>
+                    </td>
+                    <td data-label="Amount" class="tx-amount" style="color: {% if tx.amount > 0 %}var(--success){% else %}var(--gold-light){% endif %};">
+                        {% if tx.amount > 0 %}+{% endif %}${{ tx.amount }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">No transactions found. Your history will appear here once you make a transfer or deposit.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

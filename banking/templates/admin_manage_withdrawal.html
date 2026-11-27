@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .admin-manage-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gold-light);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 25px;
+        transition: 0.3s;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 10px 18px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+    }
+
+    .back-link:hover {
+        background: rgba(212, 175, 55, 0.2);
+        border-color: var(--gold);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .admin-card {
+        background: linear-gradient(160deg, #16130d, #100d09);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 50px rgba(212, 175, 55, 0.08);
+        position: relative;
+    }
+
+    .admin-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .page-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 800;
+        margin-bottom: 5px;
+        color: var(--gold-light);
+        font-size: 28px;
+        letter-spacing: 0.5px;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+
+    /* Detail Panel */
+    .detail-panel {
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .detail-row:first-child {
+        padding-top: 0;
+    }
+
+    .detail-label {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        color: var(--text-dark);
+        font-weight: 700;
+        font-size: 15px;
+        font-family: 'JetBrains Mono', monospace;
+        text-align: right;
+    }
+
+    .detail-value.highlight {
+        color: var(--gold-light);
+        font-size: 18px;
+    }
+
+    /* Dynamic Status Colors */
+    .status-pending { color: var(--gold); }
+    .status-completed { color: var(--success); }
+    .status-rejected { color: var(--danger); }
+    .status-processing { color: #38bdf8; }
+    .status-requires { color: var(--gold-light); }
+
+    /* Form Styling */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 12px;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--gold-light);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        padding: 15px;
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 14px;
+        color: var(--text-dark);
+        outline: none;
+        transition: 0.3s;
+    }
+
+    .form-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-input:focus, .form-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        background: rgba(20, 17, 12, 0.9);
+    }
+
+    /* Custom Select Arrow */
+    .form-select {
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px top 50%;
+        background-size: 12px auto;
+    }
+
+    .form-select option {
+        background: #100d09;
+        color: var(--text-dark);
+    }
+
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+        color: #1a1410;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5);
+    }
+
+    @media (max-width: 600px) {
+        .admin-card { padding: 30px 20px; margin: 10px; }
+        .detail-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+        .detail-value { text-align: left; }
+    }
+</style>
+
+<div class="admin-manage-container">
+    <a href="{% url 'admin_dashboard' %}" class="back-link">← Back to Admin Panel</a>
+    
+    <div class="admin-card">
+        <h2 class="page-title">Manage Withdrawal</h2>
+        <p class="page-subtitle">Review, verify, and finalize the user's withdrawal request.</p>
+
+        <div class="detail-panel">
+            <div class="detail-row">
+                <span class="detail-label">User</span>
+                <span class="detail-value">{{ withdrawal.user.username }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Amount</span>
+                <span class="detail-value highlight">${{ withdrawal.amount }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Bank</span>
+                <span class="detail-value">{{ withdrawal.bank_name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Account Name</span>
+                <span class="detail-value">{{ withdrawal.account_name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Account Number</span>
+                <span class="detail-value">{{ withdrawal.account_number }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Current Status</span>
+                <span class="detail-value 
+                    {% if withdrawal.status == 'Pending' %}status-pending
+                    {% elif withdrawal.status == 'Completed' %}status-completed
+                    {% elif withdrawal.status == 'Rejected' %}status-rejected
+                    {% elif withdrawal.status == 'Processing' %}status-processing
+                    {% elif withdrawal.status == 'Requires Code' %}status-requires{% endif %}">
+                    {{ withdrawal.status }}
+                </span>
+            </div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Update Status</label>
+                <select name="status" class="form-select">
+                    <option value="Pending" {% if withdrawal.status == 'Pending' %}selected{% endif %}>Pending (Waiting for Admin Action)</option>
+                    <option value="Requires Code" {% if withdrawal.status == 'Requires Code' %}selected{% endif %}>Requires Code (Prompt user for IMT Code)</option>
+                    <option value="Processing" {% if withdrawal.status == 'Processing' %}selected{% endif %}>Processing (User entered code, awaiting approval)</option>
+                    <option value="Completed" {% if withdrawal.status == 'Completed' %}selected{% endif %}>✅ Successful (Deducts user balance)</option>
+                    <option value="Rejected" {% if withdrawal.status == 'Rejected' %}selected{% endif %}>❌ Rejected / Failed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Note (Shown to user)</label>
+                <input type="text" name="admin_note" class="form-input" value="{{ withdrawal.admin_note|default:'' }}" placeholder="e.g., Please pay a fee to unlock.">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label class="form-label">Required IMT Code</label>
+                <input type="text" name="required_code" class="form-input" value="{{ withdrawal.required_code|default:'' }}" placeholder="e.g., 2442">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

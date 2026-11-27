@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .deposit-card { 
+        max-width: 650px; 
+        margin: 20px auto; 
+        padding: 40px; 
+        background: linear-gradient(160deg, #16130d, #100d09); 
+        border-radius: 24px; 
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05);
+        position: relative;
+    }
+
+    .deposit-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .deposit-card h2 {
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 10px;
+        font-weight: 800;
+        text-align: center;
+        color: var(--gold-light);
+        font-size: 28px;
+        letter-spacing: 0.5px;
+    }
+
+    .deposit-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 35px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .payment-group {
+        margin-bottom: 25px;
+    }
+
+    .payment-label {
+        font-family: 'Playfair Display', serif;
+        color: var(--gold-light);
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Crypto Address Box */
+    .address-box {
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--gold);
+        padding: 15px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        transition: 0.3s;
+    }
+
+    .address-box:hover {
+        background: rgba(20, 17, 12, 0.9);
+        border-color: var(--border-strong);
+    }
+
+    .address-text {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-dark);
+        font-size: 13px;
+        word-break: break-all;
+        line-height: 1.5;
+    }
+
+    .copy-btn {
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid var(--border-strong);
+        color: var(--gold-light);
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .copy-btn:hover {
+        background: rgba(212, 175, 55, 0.25);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        color: #fff;
+    }
+
+    /* Bank Transfer Box */
+    .bank-transfer-section {
+        border-top: 1px solid var(--border);
+        padding-top: 25px;
+        margin-top: 30px;
+    }
+
+    .bank-box {
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .bank-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 14px;
+    }
+
+    .bank-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .bank-row:first-child {
+        padding-top: 0;
+    }
+
+    .bank-label {
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .bank-value {
+        color: var(--text-dark);
+        font-weight: 700;
+        text-align: right;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-chat-support {
+        width: 100%;
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+        color: #1a1410;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 30px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-chat-support:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5);
+    }
+
+    .error-notice {
+        text-align: center;
+        color: var(--danger);
+        background: rgba(248, 113, 113, 0.1);
+        border: 1px solid rgba(248, 113, 113, 0.3);
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+        .deposit-card { padding: 30px 20px; margin: 10px; }
+        .address-box { flex-direction: column; align-items: flex-start; }
+        .copy-btn { width: 100%; text-align: center; }
+        .bank-row { flex-direction: column; gap: 5px; text-align: left; }
+        .bank-value { text-align: left; }
+    }
+</style>
+
+<div class="deposit-card">
+    <h2>Deposit Funds</h2>
+    <p class="deposit-subtitle">Send funds to any of the accounts below. Contact support after payment to credit your account.</p>
+
+    {% if payment_settings %}
+        <div class="payment-group">
+            <div class="payment-label">₿ Bitcoin (BTC)</div>
+            <div class="address-box">
+                <div class="address-text">{{ payment_settings.bitcoin_address|default:"Not configured yet. Contact Admin." }}</div>
+                {% if payment_settings.bitcoin_address %}
+                    <button class="copy-btn" onclick="copyText('{{ payment_settings.bitcoin_address }}', this)">Copy</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="payment-group">
+            <div class="payment-label">Ξ Ethereum (ETH)</div>
+            <div class="address-box">
+                <div class="address-text">{{ payment_settings.ethereum_address|default:"Not configured yet. Contact Admin." }}</div>
+                {% if payment_settings.ethereum_address %}
+                    <button class="copy-btn" onclick="copyText('{{ payment_settings.ethereum_address }}', this)">Copy</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="payment-group">
+            <div class="payment-label">₮ USDT (TRC20)</div>
+            <div class="address-box">
+                <div class="address-text">{{ payment_settings.usdt_address|default:"Not configured yet. Contact Admin." }}</div>
+                {% if payment_settings.usdt_address %}
+                    <button class="copy-btn" onclick="copyText('{{ payment_settings.usdt_address }}', this)">Copy</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bank-transfer-section">
+            <div class="payment-label" style="margin-bottom: 15px;">🏦 Bank Transfer</div>
+            <div class="bank-box">
+                <div class="bank-row">
+                    <span class="bank-label">Bank Name</span>
+                    <span class="bank-value">{{ payment_settings.bank_name|default:"N/A" }}</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Name</span>
+                    <span class="bank-value">{{ payment_settings.account_name|default:"N/A" }}</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Number</span>
+                    <span class="bank-value">{{ payment_settings.account_number|default:"N/A" }}</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Swift Code</span>
+                    <span class="bank-value">{{ payment_settings.swift_code|default:"N/A" }}</span>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="error-notice">
+            Payment details have not been configured by the Admin yet.
+        </div>
+    {% endif %}
+
+    <button onclick="toggleChat()" class="btn-chat-support">I have made a deposit (Chat Support)</button>
+</div>
+
+<script>
+    function copyText(text, btnElement) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = btnElement.innerText;
+            btnElement.innerText = 'Copied!';
+            btnElement.style.background = 'var(--gold)';
+            btnElement.style.color = '#1a1410';
+            
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.style.background = 'rgba(212, 175, 55, 0.1)';
+                btnElement.style.color = 'var(--gold-light)';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy to clipboard.');
+        });
+    }
+</script>
+{% endblock %}

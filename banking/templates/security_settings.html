@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .security-card {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 45px 40px;
+        background: linear-gradient(160deg, #16130d, #100d09);
+        border-radius: 24px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 50px rgba(212, 175, 55, 0.08);
+        position: relative;
+    }
+
+    .security-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .security-title {
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 10px;
+        font-weight: 800;
+        text-align: center;
+        color: var(--gold-light);
+        font-size: 28px;
+        letter-spacing: 0.5px;
+    }
+
+    .security-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Django Messages Styling */
+    .alert-message {
+        padding: 14px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        text-align: center;
+        border: 1px solid;
+        animation: slideDown 0.4s ease;
+    }
+
+    .alert-success {
+        background: rgba(74, 222, 128, 0.1);
+        color: var(--success);
+        border-color: rgba(74, 222, 128, 0.3);
+        box-shadow: 0 0 15px rgba(74, 222, 128, 0.1);
+    }
+
+    .alert-error {
+        background: rgba(248, 113, 113, 0.1);
+        color: var(--danger);
+        border-color: rgba(248, 113, 113, 0.3);
+        box-shadow: 0 0 15px rgba(248, 113, 113, 0.1);
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .input-group label {
+        font-weight: 700;
+        font-size: 11px;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--gold-light);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 15px 15px 15px 42px;
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text-dark);
+        outline: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+    .input-wrapper input:focus {
+        border-color: var(--gold);
+        background: rgba(20, 17, 12, 0.9);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    }
+
+    .input-wrapper span {
+        position: absolute;
+        left: 15px;
+        color: var(--gold);
+        font-size: 16px;
+        pointer-events: none;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+        color: #1a1410;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5);
+    }
+
+    @media (max-width: 600px) {
+        .security-card { padding: 35px 25px; margin: 10px; }
+    }
+</style>
+
+<div class="security-card">
+    <h2 class="security-title">Security Settings</h2>
+    <p class="security-subtitle">Update your password to keep your account secure.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-message {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="input-group">
+            <label>Current Password</label>
+            <div class="input-wrapper">
+                <span>🔒</span>
+                <input type="password" name="old_password" required placeholder="Enter current password">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>New Password</label>
+            <div class="input-wrapper">
+                <span>🗝️</span>
+                <input type="password" name="new_password1" required placeholder="Enter new password">
+            </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 30px;">
+            <label>Confirm New Password</label>
+            <div class="input-wrapper">
+                <span>🛡️</span>
+                <input type="password" name="new_password2" required placeholder="Confirm new password">
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Update Password
+        </button>
+    </form>
+</div>
+{% endblock %}

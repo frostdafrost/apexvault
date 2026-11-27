@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .inbox-header {
+        margin-top: 20px;
+        font-family: 'Playfair Display', serif;
+        font-weight: 800;
+        color: var(--gold-light);
+        font-size: 32px;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+    }
+
+    .inbox-card {
+        background: linear-gradient(160deg, #16130d, #100d09);
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 50px rgba(212, 175, 55, 0.08);
+        overflow-x: auto; /* Allows scrolling if it's still too wide */
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+    }
+
+    .inbox-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+    
+    .inbox-table {
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+        min-width: 500px; /* Forces a minimum width to keep the layout neat */
+    }
+    
+    .inbox-table th {
+        padding: 15px 15px;
+        border-bottom: 1px solid var(--border-strong);
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+    
+    .inbox-table td {
+        padding: 18px 15px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        color: var(--text-dark);
+        word-wrap: break-word; /* Prevents long text from stretching the table */
+        vertical-align: middle;
+    }
+
+    .inbox-table tr:hover td {
+        background: rgba(212, 175, 55, 0.03);
+    }
+
+    .inbox-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .username-text {
+        font-weight: 800;
+        color: var(--gold-light);
+        font-size: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    .last-msg-text {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    /* "You" Badge */
+    .you-badge {
+        background: rgba(212, 175, 55, 0.15);
+        color: var(--gold-light);
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-right: 5px;
+        border: 1px solid var(--border);
+    }
+
+    /* Reply Button */
+    .reply-btn {
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+        color: #1a1410;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        display: inline-block;
+    }
+
+    .reply-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    }
+
+    .empty-inbox {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 15px;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 768px) {
+        .inbox-card {
+            padding: 15px;
+        }
+        .inbox-table th, .inbox-table td {
+            padding: 12px 10px;
+            font-size: 13px;
+        }
+        .username-text { font-size: 14px; }
+        .reply-btn { padding: 8px 15px; font-size: 12px; }
+        .inbox-header { font-size: 26px; }
+    }
+</style>
+
+<h2 class="inbox-header">Support Inbox</h2>
+
+<div class="inbox-card">
+    <table class="inbox-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Last Message</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chat in chats %}
+            <tr>
+                <td class="username-text">{{ chat.user.username }}</td>
+                <td class="last-msg-text">
+                    {% if chat.last_msg.is_admin_reply %}
+                        <span class="you-badge">You</span> {{ chat.last_msg.message }}
+                    {% else %}
+                        {{ chat.last_msg.message }}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'admin_chat_detail' chat.user.id %}" class="reply-btn">Reply</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="empty-inbox">
+                    No support messages yet. All caught up!
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

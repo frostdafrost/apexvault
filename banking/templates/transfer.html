@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .transfer-container { 
+        display: flex; 
+        gap: 30px; 
+        margin-top: 20px; 
+        max-width: 1000px; 
+        margin: 20px auto; 
+    }
+    
+    .transfer-form-box { 
+        flex: 1.5; 
+        background: linear-gradient(160deg, #16130d, #100d09); 
+        border-radius: 22px; 
+        padding: 35px; 
+        border: 1px solid var(--border); 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05);
+        position: relative;
+    }
+    
+    .transfer-form-box::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 22px 22px 0 0;
+    }
+
+    .transfer-help-box { 
+        flex: 1; 
+        background: linear-gradient(160deg, #1a1610, #100d09); 
+        border-radius: 22px; 
+        padding: 30px; 
+        border: 1px solid var(--border); 
+        height: fit-content; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        position: relative;
+    }
+
+    .transfer-help-box::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold-deep), transparent);
+        opacity: 0.6;
+        border-radius: 22px 22px 0 0;
+    }
+    
+    .page-title { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 25px; 
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .page-title h3 { 
+        font-family: 'Playfair Display', serif;
+        font-size: 20px; 
+        color: var(--text-dark); 
+        letter-spacing: 0.5px;
+    }
+    
+    /* Toggle Buttons (Wire vs Local) */
+    .toggle-btns { 
+        display: flex; 
+        background: rgba(10, 9, 8, 0.6); 
+        border: 1px solid var(--border);
+        border-radius: 10px; 
+        padding: 4px; 
+    }
+    
+    .toggle-btns button { 
+        border: none; 
+        padding: 8px 16px; 
+        border-radius: 8px; 
+        font-weight: 700; 
+        font-size: 12px; 
+        cursor: pointer; 
+        transition: 0.3s;
+        letter-spacing: 0.5px;
+    }
+    
+    .toggle-btns button.active { 
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
+        color: #1a1410; 
+        box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
+    }
+    
+    .toggle-btns button.inactive { 
+        background: transparent; 
+        color: var(--text-muted); 
+    }
+    .toggle-btns button.inactive:hover {
+        color: var(--gold-light);
+    }
+    
+    .balance-large { 
+        font-family: 'Playfair Display', serif;
+        font-size: 36px; 
+        font-weight: 800; 
+        margin-bottom: 25px; 
+        color: var(--gold-light);
+        text-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+    
+    .form-row { display: flex; gap: 18px; margin-bottom: 18px; }
+    .form-col { flex: 1; min-width: 0; }
+    
+    .input-group label, .form-col label {
+        display: block;
+        font-size: 11px;
+        margin-bottom: 8px;
+        color: var(--gold-light);
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .input-icon-group { position: relative; display: flex; align-items: center; }
+    
+    .input-icon-group input, 
+    .input-icon-group select { 
+        width: 100%; 
+        padding: 15px 15px 15px 42px; 
+        border: 1px solid var(--border); 
+        border-radius: 12px; 
+        outline: none; 
+        font-size: 14px; 
+        background: rgba(10, 9, 8, 0.6); 
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: 0.3s;
+    }
+    
+    .input-icon-group input:focus, 
+    .input-icon-group select:focus {
+        border-color: var(--gold);
+        background: rgba(20, 17, 12, 0.9);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    }
+
+    .input-icon-group input::placeholder { color: var(--text-muted); }
+    .input-icon-group select option { background: #100d09; color: var(--text-dark); }
+    
+    .input-icon-group span { 
+        position: absolute; 
+        left: 15px; 
+        color: var(--gold); 
+        font-size: 16px; 
+        pointer-events: none;
+        font-weight: bold;
+    }
+    
+    .submit-btn { 
+        width: 100%; 
+        padding: 16px; 
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
+        color: #1a1410; 
+        border: none; 
+        border-radius: 12px; 
+        font-weight: 800; 
+        font-size: 14px; 
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer; 
+        margin-top: 25px; 
+        transition: 0.3s; 
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    .submit-btn:hover { 
+        transform: translateY(-2px);
+        filter: brightness(1.1); 
+        box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5); 
+    }
+
+    .help-title { 
+        font-family: 'Playfair Display', serif;
+        color: var(--gold-light); 
+        font-size: 20px; 
+        font-weight: 800; 
+        margin-bottom: 15px; 
+        letter-spacing: 0.5px;
+    }
+    
+    .help-text { 
+        font-size: 13px; 
+        color: var(--text-muted); 
+        line-height: 1.7; 
+        margin-bottom: 20px; 
+    }
+    
+    /* Premium Security Notice */
+    .security-notice { 
+        background: rgba(212, 175, 55, 0.08); 
+        border: 1px solid var(--border-strong); 
+        border-left: 3px solid var(--gold);
+        padding: 20px; 
+        border-radius: 12px; 
+        margin-bottom: 25px; 
+        box-shadow: inset 0 1px 0 rgba(247, 231, 160, 0.1);
+    }
+    
+    .security-notice h4 { 
+        color: var(--gold); 
+        margin-bottom: 6px; 
+        font-size: 14px; 
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .security-notice p { 
+        color: var(--text-dark); 
+        font-size: 13px; 
+        line-height: 1.5;
+    }
+
+    /* Error Box */
+    .error-box {
+        background: rgba(248, 113, 113, 0.1);
+        border: 1px solid rgba(248, 113, 113, 0.3);
+        border-left: 3px solid var(--danger);
+        color: var(--danger);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    /* Help Box Inner Styling */
+    .help-inner-box {
+        background: rgba(212, 175, 55, 0.05);
+        border: 1px solid var(--border);
+        padding: 18px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+    }
+    .help-inner-box h4 {
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        font-weight: 700;
+    }
+    .help-inner-box p {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .chat-support-btn {
+        display: block;
+        text-align: center;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid var(--border-strong);
+        color: var(--gold-light);
+        padding: 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+    .chat-support-btn:hover {
+        background: rgba(212, 175, 55, 0.2);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        color: #fff;
+    }
+
+    /* MOBILE FIX */
+    @media (max-width: 768px) {
+        .transfer-container { flex-direction: column; padding: 0 15px; }
+        .form-row { flex-direction: column; gap: 15px; }
+        .transfer-form-box { padding: 25px 20px; }
+        .transfer-help-box { padding: 25px 20px; }
+        .balance-large { font-size: 30px; }
+        .page-title { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+
+<div class="transfer-container">
+    <div class="transfer-form-box">
+        <div class="page-title">
+            <h3>← Wire Transfer</h3>
+            <div class="toggle-btns">
+                <button type="button" class="active">Wire Transfer</button>
+                <button type="button" class="inactive">Local Transfer</button>
+            </div>
+        </div>
+
+        <div class="balance-large">$ {{ account.balance }}</div>
+
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'transfer' %}">
+            {% csrf_token %}
+            
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label>Enter Amount*</label>
+                <div class="input-icon-group">
+                    <span>$</span>
+                    <input type="number" name="amount" placeholder="0.00" value="{{ form_data.amount|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Transfer From*</label>
+                    <div class="input-icon-group">
+                        <span>💼</span>
+                        <select>
+                            <option>Main Bank ({{ account.account_number }})</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <label>Beneficiary Account No.*</label>
+                    <div class="input-icon-group">
+                        <span>💳</span>
+                        <input type="text" name="account_number" placeholder="Enter Number" value="{{ form_data.account_number|default:'' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Beneficiary Account Name*</label>
+                    <div class="input-icon-group">
+                        <span>👤</span>
+                        <input type="text" name="name" placeholder="Enter Name" value="{{ form_data.name|default:'' }}" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <label>Beneficiary Bank Name*</label>
+                    <div class="input-icon-group">
+                        <span>🏦</span>
+                        <input type="text" name="bank_name" placeholder="Enter Bank" value="{{ form_data.bank_name|default:'' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Swift Code*</label>
+                    <div class="input-icon-group">
+                        <span>:::</span>
+                        <input type="text" name="swift_code" placeholder="Enter Swift" value="{{ form_data.swift_code|default:'' }}" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <label>Country*</label>
+                    <div class="input-icon-group">
+                        <span>🌍</span>
+                        <select name="country" required>
+                            <option value="">Choose...</option>
+                            <option value="Australia">Australia (AUD)</option>
+                            <option value="New Zealand">New Zealand (NZD)</option>
+                            <option value="Fiji">Fiji (FJD)</option>
+                            <option value="Tonga">Tonga (TOP)</option>
+                            <option value="USA">USA (USD)</option>
+                            <option value="UK">UK (GBP)</option>
+                            <option value="Canada">Canada (CAD)</option>
+                            <option value="South Africa">South Africa (ZAR)</option>
+                            <option value="India">India (INR)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMT SECTION -->
+            <div class="security-notice">
+                <h4>⚠️ Security Notice:</h4>
+                <p>{% if admin_instruction %}{{ admin_instruction.instruction_text }}{% else %}Security verification is required. Please contact support for your unique IMT code.{% endif %}</p>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label>Enter IMT Code*</label>
+                <div class="input-icon-group">
+                    <span>🔒</span>
+                    <input type="text" name="imt_code" placeholder="Enter the code provided by support" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Send Funds</button>
+        </form>
+    </div>
+
+    <div class="transfer-help-box">
+        <h3 class="help-title">What is an IMT Code?</h3>
+        <p class="help-text">The IMT (International Money Transfer) Code is a mandatory security protocol for high-value transfers. It ensures compliance with global anti-money laundering (AML) standards.</p>
+        
+        <div class="help-inner-box">
+            <h4>🔒 How to get your code:</h4>
+            <p>If a code is required, a security notice will appear on this form. Please contact our Live Support team to obtain your unique IMT Code before proceeding.</p>
+        </div>
+
+        <a href="#" onclick="toggleChat(); return false;" class="chat-support-btn">Chat Live Support</a>
+    </div>
+</div>
+{% endblock %}

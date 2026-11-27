@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Open Account | ApexVault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-base: #0a0908; 
+            --bg-card: rgba(20, 17, 12, 0.65);
+            --gold: #d4af37; 
+            --gold-light: #f7e7a0;
+            --gold-deep: #8c6d1f;
+            --gold-glow: rgba(212, 175, 55, 0.35);
+            --text-dark: #f5f0e1;
+            --text-muted: #8a8270;
+            --border: rgba(212, 175, 55, 0.15); 
+            --border-strong: rgba(212, 175, 55, 0.4);
+            --danger: #f87171;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--text-dark); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 40px 20px; 
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Animated Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: floatOrb 10s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+        .orb-1 { width: 400px; height: 400px; background: rgba(212, 175, 55, 0.12); top: -100px; left: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: rgba(140, 109, 31, 0.1); bottom: 0; right: -50px; animation-delay: -5s; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 40px) scale(1.1); }
+        }
+
+        /* Noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: overlay;
+        }
+        
+        /* Card Container */
+        .reg-box { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-strong); 
+            padding: 45px 40px; 
+            border-radius: 24px; 
+            width: 100%; 
+            max-width: 650px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 60px rgba(212, 175, 55, 0.08), inset 0 1px 0 rgba(247, 231, 160, 0.15); 
+            backdrop-filter: blur(24px); 
+            -webkit-backdrop-filter: blur(24px);
+            position: relative;
+            z-index: 10;
+            animation: slideUpFade 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-family: 'Playfair Display', serif;
+            font-size: 32px; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, #ffffff, var(--gold-light), var(--gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Layout */
+        .row { display: flex; gap: 16px; margin-bottom: 15px; }
+        .col { flex: 1; min-width: 0; }
+        .input-group { margin-bottom: 16px; text-align: left; }
+        
+        .input-group label { 
+            display: block; 
+            font-size: 11px; 
+            margin-bottom: 8px; 
+            color: var(--gold-light); 
+            font-weight: 700; 
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+
+        .input-group input, .input-group select { 
+            width: 100%; 
+            padding: 15px 16px; 
+            background: rgba(10, 9, 8, 0.6); 
+            border: 1px solid var(--border); 
+            border-radius: 14px; 
+            color: var(--text-dark); 
+            outline: none; 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input[type="date"] { color-scheme: dark; }
+        
+        .input-group input:focus, .input-group select:focus { 
+            border-color: var(--gold); 
+            background: rgba(20, 17, 12, 0.9);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        .input-group input::placeholder { color: var(--text-muted); font-weight: 400; }
+        
+        .input-group select option { background: #100d09; color: var(--text-dark); }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: 0.3s;
+            user-select: none;
+        }
+        .toggle-password:hover { color: var(--gold); }
+        
+        /* Submit Button */
+        .btn-submit { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
+            color: #1a1410; 
+            border: none; 
+            border-radius: 14px; 
+            font-weight: 800; 
+            font-size: 14px; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer; 
+            margin-top: 20px; 
+            transition: 0.3s; 
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 54px;
+        }
+        
+        .btn-submit:hover { 
+            transform: translateY(-2px);
+            filter: brightness(1.1); 
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5); 
+        }
+        .btn-submit:active { transform: translateY(0); }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(26, 20, 16, 0.3);
+            border-top: 3px solid #1a1410;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        /* Footer Link */
+        .login-link { 
+            text-align: center; 
+            margin-top: 28px; 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            font-weight: 500;
+        }
+        .login-link a { 
+            color: var(--gold-light); 
+            text-decoration: none; 
+            font-weight: 700; 
+            transition: 0.3s;
+            margin-left: 4px;
+        }
+        .login-link a:hover { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
+
+        /* Error Message Box */
+        .error { 
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-left: 3px solid var(--danger);
+            color: var(--danger);
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 22px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KYC SECTION */
+        .kyc-section { 
+            background: rgba(10, 9, 8, 0.5); 
+            border: 1px solid var(--border-strong); 
+            padding: 25px; 
+            border-radius: 18px; 
+            margin-top: 25px; 
+            margin-bottom: 10px; 
+            position: relative;
+        }
+        .kyc-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.5;
+        }
+        .kyc-section h3 { 
+            font-family: 'Playfair Display', serif;
+            font-size: 18px; 
+            margin-bottom: 20px; 
+            color: var(--gold-light); 
+            letter-spacing: 0.5px;
+        }
+        
+        .file-upload { 
+            background: rgba(20, 17, 12, 0.6); 
+            border: 1px dashed var(--border-strong); 
+            padding: 15px; 
+            border-radius: 14px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin-bottom: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 130px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .file-upload:hover { 
+            border-color: var(--gold); 
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+        .file-upload input { display: none; }
+        .file-upload label { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            width: 100%; 
+            height: 100%; 
+            font-weight: 600;
+        }
+        .file-upload label span { display: block; font-size: 28px; margin-bottom: 8px; }
+        
+        /* Image Preview */
+        .preview-img { 
+            display: none; 
+            max-width: 100%; 
+            max-height: 100px; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            object-fit: contain; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 600px) {
+            .reg-box { padding: 35px 25px; }
+            .row { flex-direction: column; gap: 0; }
+            h2 { font-size: 28px; }
+            .kyc-section { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="reg-box">
+        <h2>Open Your Account</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" id="registerForm">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col input-group">
+                    <label>First Name*</label>
+                    <input type="text" name="first_name" required autocomplete="given-name">
+                </div>
+                <div class="col input-group">
+                    <label>Middle Name</label>
+                    <input type="text" name="middle_name" autocomplete="additional-name">
+                </div>
+                <div class="col input-group">
+                    <label>Last Name*</label>
+                    <input type="text" name="last_name" required autocomplete="family-name">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col input-group">
+                    <label>Email Address*</label>
+                    <input type="email" name="email" required autocomplete="email">
+                </div>
+                <div class="col input-group">
+                    <label>Phone Number*</label>
+                    <input type="text" name="phone" required autocomplete="tel">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col input-group">
+                    <label>Date of Birth*</label>
+                    <input type="date" name="dob" required>
+                </div>
+                <div class="col input-group">
+                    <label>Preferred Currency*</label>
+                    <select name="currency" required>
+                        <option value="AUD">AUD - Australian Dollar</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="NZD">NZD - New Zealand Dollar</option>
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="FJD">FJD - Fijian Dollar</option>
+                        <option value="INR">INR - Indian Rupee</option>
+                        <option value="EUR">EUR - Euro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col input-group">
+                    <label>Country*</label>
+                    <input type="text" name="country" required autocomplete="country-name">
+                </div>
+                <div class="col input-group">
+                    <label>State of Origin*</label>
+                    <input type="text" name="state" required autocomplete="address-level1">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Residential Address*</label>
+                <input type="text" name="address" required autocomplete="street-address">
+            </div>
+
+            <div class="input-group">
+                <label>Password*</label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" id="id_password" required autocomplete="new-password">
+                    <span class="toggle-password" id="togglePassword" title="Toggle Visibility">👁️</span>
+                </div>
+            </div>
+
+            <div class="kyc-section">
+                <h3>Identity Verification (KYC)</h3>
+                
+                <div class="input-group">
+                    <label>Select ID Type*</label>
+                    <select name="id_type" required>
+                        <option value="">Choose ID Type...</option>
+                        <option value="Passport">Passport</option>
+                        <option value="Drivers License">Driver's License</option>
+                        <option value="National ID">National ID Card</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col file-upload">
+                        <input type="file" name="id_front" id="id_front" accept="image/*" required onchange="previewImage(event, 'preview_front', 'text_front')">
+                        <label for="id_front">
+                            <img id="preview_front" class="preview-img">
+                            <span id="icon_front">📄</span>
+                            <span id="text_front">Upload ID (Front)</span>
+                        </label>
+                    </div>
+                    <div class="col file-upload">
+                        <input type="file" name="id_back" id="id_back" accept="image/*" onchange="previewImage(event, 'preview_back', 'text_back')">
+                        <label for="id_back">
+                            <img id="preview_back" class="preview-img">
+                            <span id="icon_back">📄</span>
+                            <span id="text_back">Upload ID (Back - Optional)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="file-upload">
+                    <input type="file" name="selfie" id="selfie" accept="image/*" capture="user" required onchange="previewImage(event, 'preview_selfie', 'text_selfie')">
+                    <label for="selfie">
+                        <img id="preview_selfie" class="preview-img">
+                        <span id="icon_selfie">🤳</span>
+                        <span id="text_selfie">Take a Selfie for Face Verification</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span id="btnText">Create Account</span>
+                <div class="spinner" id="btnSpinner"></div>
+            </button>
+        </form>
+
+        <div class="login-link">Already have an account? <a href="{% url 'login' %}">Log In</a></div>
+    </div>
+
+    <!-- JAVASCRIPT FOR THE IMAGE PREVIEW -->
+    <script>
+        // Original Preview Function (Intact)
+        function previewImage(event, imgId, textId) {
+            const input = event.target;
+            const imgElement = document.getElementById(imgId);
+            const textElement = document.getElementById(textId);
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imgElement.src = e.target.result;
+                    imgElement.style.display = 'block'; // Show the image
+                    textElement.innerText = "Image Selected ✅"; // Change text to confirm
+                    
+                    // Optional: Hide the icon when image is selected
+                    const iconId = imgId.replace('preview_', 'icon_');
+                    const iconElement = document.getElementById(iconId);
+                    if(iconElement) iconElement.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Password Toggle Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('id_password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Loading State on Submit
+        const registerForm = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        registerForm.addEventListener('submit', function() {
+            // Check HTML5 validation before triggering loading state
+            if (registerForm.checkValidity()) {
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'block';
+                submitBtn.style.opacity = '0.8';
+                submitBtn.style.pointerEvents = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

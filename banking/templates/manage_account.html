@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .manage-card {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 45px 40px;
+        background: linear-gradient(160deg, #16130d, #100d09);
+        border-radius: 24px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 50px rgba(212, 175, 55, 0.08);
+        position: relative;
+    }
+
+    .manage-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .manage-title {
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 30px;
+        font-weight: 800;
+        text-align: center;
+        color: var(--gold-light);
+        font-size: 28px;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .avatar-circle {
+        width: 110px;
+        height: 110px;
+        font-size: 44px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+        color: #1a1410;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        font-family: 'Playfair Display', serif;
+        border: 3px solid rgba(247, 231, 160, 0.4);
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+
+    .avatar-circle:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 35px rgba(212, 175, 55, 0.5);
+    }
+
+    .avatar-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-name {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+
+    .user-email {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* Data Panel */
+    .info-panel {
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px 25px;
+        margin-bottom: 30px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-row:first-child {
+        padding-top: 0;
+    }
+
+    .info-label {
+        color: var(--gold);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .info-value {
+        color: var(--text-dark);
+        font-weight: 700;
+        font-size: 15px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .info-value.text-normal {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Status Pill */
+    .status-active {
+        background: rgba(74, 222, 128, 0.1);
+        color: var(--success);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
+    }
+
+    /* Button */
+    .edit-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+        color: #1a1410;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+
+    .edit-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5);
+    }
+
+    @media (max-width: 600px) {
+        .manage-card { padding: 35px 25px; margin: 10px; }
+        .info-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .info-value { text-align: left; }
+    }
+</style>
+
+<div class="manage-card">
+    <h2 class="manage-title">Manage Account</h2>
+    
+    <div class="profile-header">
+        <div class="avatar-circle">
+            {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
+            {% else %}
+                {{ user.username|first|upper }}
+            {% endif %}
+        </div>
+        <h3 class="user-name">{{ user.username|title }}</h3>
+        <p class="user-email">{{ user.email|default:"No email provided" }}</p>
+    </div>
+    
+    <div class="info-panel">
+        <div class="info-row">
+            <span class="info-label">Account Number</span>
+            <strong class="info-value">{{ account.account_number }}</strong>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Phone Number</span>
+            <strong class="info-value text-normal">{{ profile.phone_number|default:"Not set" }}</strong>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Account Status</span>
+            <strong class="status-active">Active</strong>
+        </div>
+    </div>
+    
+    <button onclick="document.getElementById('profileModal').style.display='flex'" class="edit-btn">
+        Edit Profile Details
+    </button>
+</div>
+{% endblock %}

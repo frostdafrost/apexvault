@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .notifications-container {
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 40px;
+        background: linear-gradient(160deg, #16130d, #100d09);
+        border-radius: 24px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 50px rgba(212, 175, 55, 0.08);
+        position: relative;
+    }
+
+    .notifications-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.6;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .notifications-title {
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 25px;
+        font-weight: 800;
+        color: var(--gold-light);
+        font-size: 28px;
+        letter-spacing: 0.5px;
+    }
+
+    .notif-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .notif-item {
+        display: flex;
+        gap: 18px;
+        padding: 22px;
+        border-radius: 16px;
+        background: rgba(10, 9, 8, 0.6);
+        border: 1px solid var(--border);
+        position: relative;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .notif-item:hover {
+        transform: translateX(4px);
+        border-color: var(--border-strong);
+    }
+
+    .notif-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+    }
+
+    .notif-content {
+        flex: 1;
+    }
+
+    .notif-title {
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 5px;
+        color: var(--text-dark);
+        letter-spacing: 0.3px;
+    }
+
+    .notif-text {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .notif-time {
+        font-size: 11px;
+        color: var(--gold-deep);
+        display: block;
+        margin-top: 8px;
+        font-weight: 600;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.5px;
+    }
+
+    /* Special Styling for Welcome Message */
+    .notif-welcome {
+        border-left: 4px solid var(--gold);
+        box-shadow: inset 4px 0 15px rgba(212, 175, 55, 0.05);
+    }
+
+    /* Income (Received Funds) */
+    .notif-income {
+        border-left: 4px solid var(--success);
+        box-shadow: inset 4px 0 15px rgba(74, 222, 128, 0.05);
+    }
+    .notif-income .notif-title {
+        color: var(--success);
+    }
+
+    /* Expense (Transfer Sent) */
+    .notif-expense {
+        border-left: 4px solid var(--danger);
+        box-shadow: inset 4px 0 15px rgba(248, 113, 113, 0.05);
+    }
+    .notif-expense .notif-title {
+        color: var(--danger);
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 40px 20px;
+        font-size: 15px;
+        font-style: italic;
+        background: rgba(10, 9, 8, 0.4);
+        border-radius: 16px;
+        border: 1px dashed var(--border);
+    }
+
+    @media (max-width: 600px) {
+        .notifications-container { padding: 25px 20px; margin: 10px; }
+        .notif-item { padding: 18px; gap: 12px; }
+        .notif-icon { font-size: 20px; }
+    }
+</style>
+
+<div class="notifications-container">
+    <h2 class="notifications-title">Notifications</h2>
+
+    <div class="notif-list">
+        <!-- Welcome Message -->
+        <div class="notif-item notif-welcome">
+            <div class="notif-icon">👋</div>
+            <div class="notif-content">
+                <h4 class="notif-title">Welcome to ApexVault!</h4>
+                <p class="notif-text">Your account is fully set up and ready to use. Start making transfers today.</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Transactions -->
+        {% for tx in transactions %}
+        <div class="notif-item {% if tx.amount > 0 %}notif-income{% else %}notif-expense{% endif %}">
+            <div class="notif-icon">{% if tx.amount > 0 %}💰{% else %}💸{% endif %}</div>
+            <div class="notif-content">
+                <h4 class="notif-title">
+                    {% if tx.amount > 0 %}Funds Received{% else %}Transfer Sent{% endif %}
+                </h4>
+                <p class="notif-text">
+                    {% if tx.amount > 0 %}
+                        You received <strong style="color: var(--text-dark); font-family: 'JetBrains Mono', monospace;">${{ tx.amount }}</strong> into your account.
+                    {% else %}
+                        You sent <strong style="color: var(--text-dark); font-family: 'JetBrains Mono', monospace;">${{ tx.amount|stringformat:"f"|slice:"1:" }}</strong> to {{ tx.beneficiary_name|default:"a beneficiary" }}.
+                    {% endif %}
+                </p>
+                <span class="notif-time">{{ tx.timestamp|date:"M d, Y - H:i" }}</span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-state">No new notifications right now. We'll alert you when something happens.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .secure-layout { display: flex; gap: 30px; margin-top: 20px; }
+    .secure-main { flex: 1.5; }
+    .secure-side { flex: 1; }
+    .secure-card { background: white; border-radius: 15px; padding: 30px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .header-title { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; font-size: 18px; font-weight: 700; }
+    .instruction-box { font-size: 14px; line-height: 1.6; color: var(--text-dark); margin-bottom: 20px; }
+    .debit-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .debit-label { font-size: 14px; color: var(--text-muted); }
+    .debit-amount { font-size: 16px; font-weight: 800; color: var(--danger); }
+    .progress-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+    .progress-bar { width: 100%; height: 8px; background: #f0f0f5; border-radius: 5px; margin-bottom: 20px; }
+    .progress-fill { height: 100%; background: var(--primary); width: 10%; border-radius: 5px; }
+    .imt-box { background: #f9f9f9; border: 1px solid var(--border); padding: 25px; border-radius: 10px; }
+    .imt-box label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
+    .imt-input { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 15px; outline: none; }
+    .cancel-link { display: block; font-size: 13px; color: var(--primary); text-decoration: none; margin-bottom: 20px; }
+    .confirm-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; }
+    .help-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
+    .chat-btn-side { display: block; text-align: center; background: var(--text-dark); color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; margin-top: 20px; }
+</style>
+
+<div class="secure-layout">
+    <div class="secure-main">
+        <div class="secure-card">
+            <div class="header-title">
+                <span>← Secure Your Transaction</span>
+                <span style="color: var(--primary); margin-left: auto;">ⓘ</span>
+            </div>
+
+            <div class="instruction-box">
+                {{ admin_instruction.instruction_text }}
+            </div>
+
+            <div class="debit-row">
+                <span class="debit-label">Debit Amount -</span>
+                <span class="debit-amount">$ {{ form_data.amount|default:"0.00" }}</span>
+            </div>
+
+            <div class="progress-header">
+                <span>Progress...</span>
+                <span>0% Finished</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+
+            <div class="imt-box">
+                {% if error %}
+                <p style="color: var(--danger); font-size: 13px; font-weight: bold; margin-bottom: 15px;">{{ error }}</p>
+                {% endif %}
+
+                <form method="POST" action="{% url 'transfer' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="verify_code">
+                    
+                    <input type="hidden" name="amount" value="{{ form_data.amount }}">
+                    <input type="hidden" name="account_number" value="{{ form_data.account_number }}">
+                    <input type="hidden" name="name" value="{{ form_data.name }}">
+                    <input type="hidden" name="bank_name" value="{{ form_data.bank_name }}">
+                    <input type="hidden" name="swift_code" value="{{ form_data.swift_code }}">
+
+                    <label>IMT CODE*</label>
+                    <input type="text" name="imt_code" class="imt-input" placeholder="Enter IMT CODE" required>
+                    
+                    <a href="{% url 'dashboard' %}" class="cancel-link">Cancel Transaction</a>
+                    
+                    <button type="submit" class="confirm-btn">Confirm Code</button>
+                </form>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 13px; color: var(--text-muted);">Need Help? Contact Customer Care</p>
+    </div>
+
+    <div class="secure-side">
+        <div class="secure-card">
+            <h3 style="font-size: 18px; color: var(--primary); margin-bottom: 15px;">What is IMT Code?</h3>
+            <p class="help-text">The IMT Code is a secure and efficient way to authorize international money transfers, ensuring compliance with global banking standards and transaction protocols.</p>
+            <p style="font-size: 13px; color: var(--primary); cursor: pointer;">Read More...</p>
+            <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <p class="help-text">Need Help? Contact Support to obtain your security codes.</p>
+                <a href="#" onclick="toggleChat(); return false;" class="chat-btn-side">Chat Live Support</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

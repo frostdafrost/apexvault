@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login | ApexVault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-base: #0a0908; 
+            --bg-card: rgba(20, 17, 12, 0.65);
+            --gold: #d4af37; 
+            --gold-light: #f7e7a0;
+            --gold-deep: #8c6d1f;
+            --gold-glow: rgba(212, 175, 55, 0.35);
+            --text-dark: #f5f0e1;
+            --text-muted: #8a8270;
+            --border: rgba(212, 175, 55, 0.15); 
+            --border-strong: rgba(212, 175, 55, 0.4);
+            --danger: #f87171;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--text-dark);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background Animated Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: floatOrb 10s infinite alternate ease-in-out;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(212, 175, 55, 0.12);
+            top: -100px; left: -100px;
+        }
+        .orb-2 {
+            width: 300px; height: 300px;
+            background: rgba(140, 109, 31, 0.1);
+            bottom: -50px; right: -50px;
+            animation-delay: -5s;
+        }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 40px) scale(1.1); }
+        }
+
+        /* Noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: overlay;
+        }
+
+        /* Login Card */
+        .login-box { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-strong); 
+            padding: 45px 40px; 
+            border-radius: 24px; 
+            width: 100%; 
+            max-width: 420px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 60px rgba(212, 175, 55, 0.08), inset 0 1px 0 rgba(247, 231, 160, 0.15); 
+            text-align: center; 
+            backdrop-filter: blur(24px); 
+            -webkit-backdrop-filter: blur(24px);
+            position: relative;
+            z-index: 10;
+            animation: slideUpFade 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            overflow: hidden;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-box::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(247, 231, 160, 0.08), transparent);
+            transform: skewX(-20deg);
+            animation: shimmerSweep 6s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmerSweep {
+            0% { left: -100%; }
+            30%, 100% { left: 200%; }
+        }
+
+        .brand-icon {
+            font-size: 44px;
+            display: inline-block;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 16px var(--gold-glow));
+            animation: pulseIcon 3s infinite alternate;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.3)); }
+            100% { transform: scale(1.05); filter: drop-shadow(0 0 24px rgba(212, 175, 55, 0.6)); }
+        }
+        
+        h2 { 
+            font-family: 'Playfair Display', serif;
+            font-size: 32px; 
+            margin-bottom: 8px; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, #ffffff, var(--gold-light), var(--gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        
+        p { 
+            color: var(--text-muted); 
+            font-size: 13px; 
+            margin-bottom: 30px; 
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Error Box */
+        .error-box {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-left: 3px solid var(--danger);
+            color: var(--danger);
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-group { margin-bottom: 22px; text-align: left; }
+        
+        .input-group label { 
+            display: block; 
+            font-size: 11px; 
+            margin-bottom: 8px; 
+            color: var(--gold-light); 
+            font-weight: 700; 
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group input { 
+            width: 100%; 
+            padding: 15px 16px; 
+            padding-right: 45px;
+            background: rgba(10, 9, 8, 0.6); 
+            border: 1px solid var(--border); 
+            border-radius: 14px; 
+            color: var(--text-dark); 
+            outline: none; 
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus { 
+            border-color: var(--gold); 
+            background: rgba(20, 17, 12, 0.9);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: 0.3s;
+            user-select: none;
+        }
+        .toggle-password:hover { color: var(--gold); }
+        
+        .btn-submit { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
+            color: #1a1410; 
+            border: none; 
+            border-radius: 14px; 
+            font-weight: 800; 
+            font-size: 14px; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer; 
+            margin-top: 10px; 
+            transition: 0.3s; 
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 52px;
+        }
+        
+        .btn-submit:hover { 
+            transform: translateY(-2px);
+            filter: brightness(1.1); 
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5); 
+        }
+
+        .btn-submit:active { transform: translateY(0); }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(26, 20, 16, 0.3);
+            border-top: 3px solid #1a1410;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .register-link { 
+            margin-top: 28px; 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            font-weight: 500;
+        }
+        
+        .register-link a { 
+            color: var(--gold-light); 
+            text-decoration: none; 
+            font-weight: 700; 
+            transition: 0.3s;
+            margin-left: 4px;
+        }
+        
+        .register-link a:hover { 
+            color: var(--gold); 
+            text-shadow: 0 0 10px var(--gold-glow); 
+        }
+        
+        @media (max-width: 480px) {
+            .login-box { padding: 35px 25px; }
+            h2 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="login-box">
+        <div class="brand-icon">🛡️</div>
+        <h2>ApexVault</h2>
+        <p>Sign in to your secure portal</p>
+
+        {% if form.errors %}
+        <div class="error-box">
+            <span>⚠️</span> Invalid credentials. Please try again.
+        </div>
+        {% endif %}
+        
+        <form method="POST" id="loginForm">
+            {% csrf_token %}
+            
+            <div class="input-group">
+                <label>Email / Username</label>
+                <div class="input-wrapper">
+                    <input type="text" name="username" placeholder="Enter your email" required autocomplete="username">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" id="id_password" placeholder="Enter your password" required autocomplete="current-password">
+                    <span class="toggle-password" id="togglePassword" title="Toggle Visibility">👁️</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span id="btnText">Sign In</span>
+                <div class="spinner" id="btnSpinner"></div>
+            </button>
+        </form>
+        
+        <div class="register-link">Don't have an account? <a href="{% url 'register' %}">Open Account</a></div>
+    </div>
+
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('id_password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Loading State on Submit
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        loginForm.addEventListener('submit', function() {
+            if (loginForm.checkValidity()) {
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'block';
+                submitBtn.style.opacity = '0.8';
+                submitBtn.style.pointerEvents = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>

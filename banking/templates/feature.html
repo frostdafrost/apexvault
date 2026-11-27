@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card card-3d" style="margin-top: 20px; padding: 50px; text-align: center; background: white; border-radius: 20px; border: 1px solid var(--border);">
+    <h1 style="font-size: 32px; color: var(--primary); margin-bottom: 15px; font-weight: 800;">{{ feature_name }}</h1>
+    <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 30px;">This feature is currently being integrated with the ApexVault core network.</p>
+    
+    <div style="width: 120px; height: 120px; background: #f4f4f9; border-radius: 50%; margin: 0 auto 30px; display: flex; justify-content: center; align-items: center; font-size: 50px;">
+        🚧
+    </div>
+
+    <h3 style="margin-bottom: 10px; font-weight: 700;">Need it urgently?</h3>
+    <p style="color: var(--text-muted); margin-bottom: 25px;">Contact our support team to enable beta access for this feature.</p>
+    
+    <button class="btn" style="background: var(--primary); padding: 12px 30px;" onclick="toggleChat()">Chat with Support</button>
+</div>
+{% endblock %}
